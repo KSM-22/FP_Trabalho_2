@@ -13,43 +13,69 @@ decida parar.
 os dados foram inseridos corretamente.
 '''
 
-def Verificar_int(arg):
+def mostrar_nome_da_variavel(**kwargs):
+    for nome in kwargs:
+        return nome
+
+def Verificar_int(**kwargs):
     while True:
         try:
-            arg = int(input(f'ddigite a {mostrar_nome_da_variavel(arg)} do {contador}º aluno: '))
-            return arg
+            nome = mostrar_nome_da_variavel(**kwargs)
+            arg = int(input(f'Digite a {nome} do {contador}º aluno: '))
+            return {nome: arg}
         except ValueError:
-            print('valor invalido')
-        break
+            print(f'{nome} inválida.\n')
 
-def mostrar_nome_da_variavel(arg):
-    for var_name, var_value in globals().items():
-        if var_value == idade:
-            print(f'{var_value}')
+def Limpar(*arg):
+    texto = str(arg[0])
+    return f'{texto.replace("[", "").replace("]", "").replace("\'", "")}'
+
+def nome_ja_cadastrado(nome, cadastros):
+    return any(aluno['nome'] == nome.title() for aluno in cadastros)
 
 cadastro_alunos = []
 contador = 1
+
 while True:
-    nome = input(f'digite o nome do {contador}º aluno: ')
-    if not nome.replace(' ','').isalpha():
-        print('Nome invalido!\n')
-        continue
+    while True:
+        nome = input(f'Digite o nome do {contador}º aluno: ')
+        if not nome.replace(' ', '').isalpha():
+            print('Nome inválido!\n')
+            continue
 
-    nome_completo = nome.split(' ')
-    if len(nome_completo) < 2 or len(nome) < 3 :
-        print('Nome invalido!\n')
-        continue
-    idade = 0
-    idade = Verificar_int(idade)
+        nome_completo = nome.split(' ')
+        if len(nome_completo) < 2 or len(nome) < 3 or nome_ja_cadastrado(nome, cadastro_alunos):
+            print('Nome inválido!\n')
+            continue
+        else:
+            break
 
-    if idade < 0 or idade > 123:
-        print('Idade invalida!\n')
+    while True:
+        idade_dict = Verificar_int(idade=None)
+        idade = idade_dict['idade']
 
-    nota = input(f'digite a nota do {contador}º aluno: ')
-    if nota.isdigit() == False:
-        print('Nota invalida"\n')
+        if idade < 0 or idade > 123:
+            print('Idade inválida!\n')
+            continue
+        else:
+            break
+
+    while True:
+        nota_dict = Verificar_int(nota=None)
+        nota = nota_dict['nota']
+        if nota < 0 or nota > 10:
+            print('Nota inválida!\n')
+            continue
+        else:
+            break
+
     aluno = {'nome': nome.title(), 'idade': idade, 'nota final': nota}
-    contador += 1
     cadastro_alunos.append(aluno)
+    mostrar_cadastro = str(cadastro_alunos)
+    print(f'\nCadastro até agora: {Limpar(mostrar_cadastro)}\n')
 
-    print(cadastro_alunos)
+    contador += 1
+
+    continuar = input("Deseja cadastrar outro aluno? (s/n): ").strip().lower()
+    if continuar != 's':
+        break
