@@ -36,6 +36,12 @@ def nome_ja_cadastrado(nome, cadastros):
 cadastro_alunos = []
 contador = 1
 
+print('-' * 60)
+print(f'{"CADASTRO DE ALUNOS":^60}')
+print('-' * 60)
+
+
+
 while True:
     while True:
         nome = input(f'Digite o nome do {contador}º aluno: ')
@@ -72,10 +78,13 @@ while True:
     aluno = {'nome': nome.title(), 'idade': idade, 'nota final': nota}
     cadastro_alunos.append(aluno)
     mostrar_cadastro = str(cadastro_alunos)
+    print('-' * 60)
     print(f'\nCadastro até agora: {Limpar(mostrar_cadastro)}\n')
-
+    print('-' * 60)
     contador += 1
 
     continuar = input("Deseja cadastrar outro aluno? (s/n): ").strip().lower()
+    print('-' * 60)
     if continuar != 's':
         break
+        print('-' * 60)
