@@ -1,17 +1,17 @@
+import getpass
 import random
 
 options = ('Pedra', 'Papel', 'Tesoura')
 
 
 def inputChoose():
-    print("""
-    Opções disponíveis:
+    print("""Opções disponíveis:
     [1] - Pedra
     [2] - Papel
     [3] - Tesoura
     """)
     while True:
-        selectedMode = str(input('Qual você vai mostrar? '))
+        selectedMode = getpass.getpass(prompt='Qual você vai mostrar? ')
         if selectedMode == "1":
             return 'Pedra'
         elif selectedMode == "2":
@@ -28,27 +28,22 @@ def findWinner(players: dict[str, str]):
 
     opt1 = players[jogadores[0]]
     opt2 = players[jogadores[1]]
-    if opt1 == 'Pedra':
-        # opt1 perdeu
-        if opt2 == 'Papel':
-            jogadores.remove(jogadores[0])
-        # opt1 ganhou
-        elif opt2 == 'Tesoura':
-            jogadores.remove(jogadores[1])
-    elif opt1 == 'Papel':
-        # opt1 perdeu
-        if opt2 == 'Tesoura':
-            jogadores.remove(jogadores[0])
-        # opt1 ganhou
-        elif opt2 == 'Pedra':
-            jogadores.remove(jogadores[1])
-    elif opt1 == 'Tesoura':
-        # opt1 perdeu
-        if opt2 == 'Pedra':
-            jogadores.remove(jogadores[0])
-        # opt1 ganhou
-        elif opt2 == 'Papel':
-            jogadores.remove(jogadores[1])
+
+    # Verifica o empate
+    if opt1 == opt2:
+        return jogadores
+
+    # Verficia a vitoria do Jogador 1
+    if opt1 == 'Pedra' and opt2 == 'Tesoura':
+        jogadores.remove(jogadores[1])
+    elif opt1 == 'Papel' and opt2 == 'Pedra':
+        jogadores.remove(jogadores[1])
+    elif opt1 == 'Tesoura' and opt2 == 'Papel':
+        jogadores.remove(jogadores[1])
+    # Se alcança o else, significa que não é empate e o J1 não ganhou, portanto, o J2 venceu.
+    else:
+        jogadores.remove(jogadores[0])
+
     return jogadores
 
 
@@ -95,11 +90,11 @@ def pve():
 def pvp():
     while True:
         betOption = str(input('Vocês vão querer apostar? (S/N)')).upper()
-        p1_name = str(input('Qual nome do Jogador 1? ')).strip().capitalize()
+        p1_name = str(input('\nQual nome do Jogador 1? ')).strip().capitalize()
         p1_choose = inputChoose()
         p1_money = 0
 
-        p2_name = str(input('Qual nome do Jogador 2? ')).strip().capitalize()
+        p2_name = str(input('\nQual nome do Jogador 2? ')).strip().capitalize()
         p2_choose = inputChoose()
         p2_money = 0
         if betOption == "S":
