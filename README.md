@@ -9,8 +9,8 @@ Ainda não informada.
 
 # Enunciados
 ## Questao 1
-###Cadastro de Alunos
-**Descrição**: Criar um programa que armazene e gerencie o cadastro de alunos,<br>
+### Cadastro de Alunos
+**Descrição:** Criar um programa que armazene e gerencie o cadastro de alunos,<br>
 incluindo nome, idade e nota final.<br>
 **Estruturas utilizadas:**<br>
 • Dicionário: Para armazenar os dados de cada aluno, onde a chave é o nome
