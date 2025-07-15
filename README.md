@@ -9,6 +9,17 @@ Ainda não informada.
 
 # Enunciados
 ## Questao 1
+###1. Cadastro de Alunos
+**Descrição**: Criar um programa que armazene e gerencie o cadastro de alunos,<br>
+incluindo nome, idade e nota final.<br>
+**Estruturas utilizadas:**<br>
+• Dicionário: Para armazenar os dados de cada aluno, onde a chave é o nome
+e o valor é uma tupla contendo idade e nota final.<br>
+• Lista: Para armazenar todos os dicionários dos alunos.<br>
+• Laço while: Para permitir o cadastro de múltiplos alunos até que o usuário
+decida parar.<br>
+• Condicionais (if, elif, else): Para verificar se o aluno já está cadastrado ou se
+os dados foram inseridos corretamente.<br>
 
 ## Questão 2
 ### Jogo de Pedra, Papel e Tesoura
