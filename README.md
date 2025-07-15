@@ -20,6 +20,8 @@ e o valor é uma tupla contendo idade e nota final.<br>
 decida parar.<br>
 • Condicionais (if, elif, else): Para verificar se o aluno já está cadastrado ou se
 os dados foram inseridos corretamente.<br>
+### Funcionalidades extras
+1. Anos de escolaridade (1º ao 9º ano do ensino Fundamental)
 
 ## Questão 2
 ### Jogo de Pedra, Papel e Tesoura
