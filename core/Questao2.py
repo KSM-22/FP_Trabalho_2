@@ -3,7 +3,6 @@ import random
 
 options = ('Pedra', 'Papel', 'Tesoura')
 
-
 def inputChoose():
     print("""Opções disponíveis:
     [1] - Pedra
@@ -65,6 +64,8 @@ def pve():
         if len(winner) > 1:
             # Empate
             print('Como os dois escolheram igual houve um empate!')
+            if money != 0:
+                print(f'Seu dinheiro apostado será devolvido com uma taxa de serviço, o estorno total será de R${money/2:.2f}')
         else:
             print(f'O vencedor foi o {winner[0]}, pois {playerChoose} ganha de {aiChoose}!')
             if money != 0:
@@ -118,6 +119,11 @@ def pvp():
         if len(winner) > 1:
             # Empate
             print('Como os dois escolheram igual houve um empate!')
+            if betOption == "S":
+                print(
+                    f"""Em casos de empate o sistema reembolsa os valores apostados com uma taxa de serviço aplicada.
+                    {p1_name} receberá {p1_money/2:.2f}
+                    {p2_name} receberá {p2_money/2:.2f}""")
         else:
             print(
                 f'O vencedor foi o {winner[0]}, pois {gameData.pop(winner[0])} ganha de {list(gameData.values())[0]}!')
@@ -140,7 +146,7 @@ display_gameModes = '-' * 30 + """
 [1] Jogador x Jogador
 [2] Jogador x Computador
 """ + '-' * 30
-print(display_gameModes)
+print(display_gameModes),
 
 while True:
     selectedMode = str(input('Selecione o modo:'))
