@@ -12,88 +12,128 @@ decida parar.
 os dados foram inseridos corretamente.
 '''
 
-def adicionar_aluno(cadastro_alunos):
-    contador = len(cadastro_alunos) + 1
-    # Validação do nome
+import random  # Importa o módulo para gerar números e escolhas aleatórias
+
+# ——— UTILITÁRIOS ———
+
+def cor_verde(texto: str) -> str:
+    '''Aplica cor verde ao texto para destacar no terminal'''
+    return f'\033[32m{texto}\033[0m'
+
+def mostrar_nome_da_variavel(**kwargs) -> str:
+    '''Retorna o nome da primeira chave passada como argumento nomeado'''
+    return next(iter(kwargs))
+
+def verificar_int(contador, **kwargs) -> dict:
+    '''Valida se a entrada é um número inteiro. Continua pedindo até ser válido'''
     while True:
-        nome = input(f'Digite o {cor_verde("nome")} do {contador}º aluno: ').strip()
+        try:
+            nome = mostrar_nome_da_variavel(**kwargs)
+            valor = int(input(f'Digite a {cor_verde(nome)} do {contador}º aluno: '))
+            return {nome: valor}
+        except ValueError:
+            print(f'{nome} inválida.\n')
+
+def limpar(texto: str) -> str:
+    '''Remove colchetes e aspas simples da string'''
+    return texto.replace('[', '').replace(']', '').replace("'", '')
+
+def nome_ja_cadastrado(nome: str, cadastros: list) -> bool:
+    '''Verifica se o nome já existe nos cadastros'''
+    return any(aluno['nome'] == nome.title() for aluno in cadastros)
+
+# ——— MENU ———
+
+def exibir_menu():
+    '''Exibe o menu principal de opções e retorna a escolha'''
+    print('—' * 60)
+    print(f'1. {cor_verde('Adicionar')} aluno')
+    print(f'2. {cor_verde('Listar')} alunos')
+    print(f'3. {cor_verde('Editar')} aluno')
+    print(f'4. {cor_verde('Deletar')} aluno')
+    print(f'5. {cor_verde('Gerar')} aluno aleatório')
+    print(f'6. {cor_verde('Sair')}')
+    print('—' * 60)
+    return input('Escolha uma opção: ').strip()
+
+# ——— CADASTRO ———
+
+def adicionar_aluno(cadastro_alunos):
+    '''Adiciona um novo aluno após validações'''
+    contador = len(cadastro_alunos) + 1
+
+    # Nome
+    while True:
+        nome = input(f'Digite o {cor_verde('nome')} do {contador}º aluno: ').strip()
         if not nome or not nome.replace(' ', '').isalpha():
             print('Nome inválido!\n')
             continue
-
-        nome_completo = nome.split(' ')
-        if len(nome_completo) < 2 or len(nome) < 3 or nome_ja_cadastrado(nome, cadastro_alunos):
-            print('Nome inválido!\n')
+        if len(nome.split()) < 2 or nome_ja_cadastrado(nome, cadastro_alunos):
+            print('Nome inválido ou já cadastrado!\n')
             continue
         break
 
-    # Validação da idade
+    # Idade
     while True:
-        idade_dict = Verificar_int(contador, idade=None)
-        idade = idade_dict['idade']
-        if idade < 0 or idade > 123:
-            print('Idade inválida!\n')
-            continue
-        break
-
-    # Validação da nota
-    while True:
-        nota_dict = Verificar_int(contador, nota=None)
-        nota = nota_dict['nota']
-        if nota < 0 or nota > 10:
-            print('Nota inválida!\n')
-            continue
-        break
-
-    # Validação da série
-    SERIES = {
-        1: '1º ano',
-        2: '2º ano',
-        3: '3º ano',
-        4: '4º ano',
-        5: '5º ano',
-        6: '6º ano',
-        7: '7º ano',
-        8: '8º ano',
-        9: '9º ano',
-    }
-
-    while True:
-        serie = int(input("Digite a série do aluno (1-9): "))
-        if 1 <= serie <= 9:
+        idade = verificar_int(contador, idade=None)['idade']
+        if 0 < idade <= 123:
             break
-        print("Série inválida!\n")
+        print('Idade inválida!\n')
 
-    # Criação e adição do aluno
-    aluno = {'nome': nome.title(), 'idade': idade, 'nota final': nota}
-    aluno['serie'] = SERIES[serie]
+    # Nota
+    while True:
+        nota = verificar_int(contador, nota=None)['nota']
+        if 0 <= nota <= 10:
+            break
+        print('Nota inválida!\n')
 
+    # Série
+    SERIES = {i: f'{i}º ano' for i in range(1, 10)}
+    while True:
+        try:
+            serie = int(input('Digite a série do aluno (1-9): '))
+            if 1 <= serie <= 9:
+                break
+            print('Série inválida!\n')
+        except ValueError:
+            print('Entrada inválida!\n')
+
+    # Status de formação
+    formado = False
     if serie == 9:
         while True:
-            status = input("O aluno já concluiu o 9º ano? (S/N): ").upper()
+            status = input('O aluno já concluiu o 9º ano? (S/N): ').upper()
             if status in ['S', 'N']:
+                formado = (status == 'S')
                 break
-            print("Resposta inválida! Digite S para Sim ou N para Não.")
-        formado = status == 'S'
-    else:
-        formado = False
+            print('Resposta inválida!')
 
-    aluno['formado'] = formado
+    aluno = {
+        'nome': nome.title(),
+        'idade': idade,
+        'nota final': nota,
+        'serie': SERIES[serie],
+        'formado': formado
+    }
+
     cadastro_alunos.append(aluno)
 
-    if serie == 9:
-        print(f"\nStatus do aluno: {'Já formado' if formado else 'Cursando 9º ano'}")
-
-    mostrar_cadastro = str(cadastro_alunos)
+    print(f'\nStatus: {'Formado' if formado else 'Em curso'}')
     print('\n' + '—' * 60)
-    print(f'\nCadastro até agora: {Limpar(mostrar_cadastro)}\n')
+    print(f'Aluno {cor_verde('Adicionado')} com Sucesso!')
+
+# ——— LISTAGEM ———
 
 def listar_alunos(cadastro_alunos):
+    '''Lista os alunos, com opções de ordenação ou filtragem'''
     if not cadastro_alunos:
-        print("\nNenhum aluno cadastrado!")
+        print('Nenhum aluno cadastrado!')
         return
 
     campo, ordem = menu_ordenacao()
+    if not campo:
+        return
+
     campo_map = {
         '1': 'nome',
         '2': 'idade',
@@ -102,229 +142,189 @@ def listar_alunos(cadastro_alunos):
         '5': 'formado'
     }
 
-    if campo in campo_map:
-        campo_ordenacao = campo_map[campo]
-        alunos_ordenados = sorted(cadastro_alunos.copy(),
-                                  key=lambda x: x[campo_ordenacao],
-                                  reverse=(ordem == '2'))
+    chave = campo_map[campo]
+    reverse = ordem == '2'
 
-        if campo == '5':
-            formados = ordem == '1'
-            alunos_filtrados = [aluno for aluno in alunos_ordenados if aluno['formado'] == formados]
-        else:
-            alunos_filtrados = alunos_ordenados
+    if campo == '5':
+        status = ordem == '1'
+        alunos_filtrados = [aluno for aluno in cadastro_alunos if aluno['formado'] == status]
+    else:
+        alunos_filtrados = sorted(cadastro_alunos, key=lambda x: x[chave], reverse=reverse)
 
-        for aluno in alunos_filtrados:
-            print('—' * 16 + f'{'Informações do Aluno':^28}' + '—' * 16)
-            print(f'\n{cor_verde('Nome')}: {aluno['nome']}')
-            print(f'{cor_verde('Idade')}: {aluno['idade']}')
-            print(f'{cor_verde('Nota')}: {aluno['nota final']}')
-            print(f'{cor_verde('Série')}: {aluno['serie']}')
-            print(f'{cor_verde('Status')}: {'Formado' if aluno['formado'] else 'Em curso'}\n')
+    for aluno in alunos_filtrados:
+        print('—' * 20)
+        print(f'{cor_verde('Nome')}: {aluno['nome']}')
+        print(f'{cor_verde('Idade')}: {aluno['idade']}')
+        print(f'{cor_verde('Nota')}: {aluno['nota final']}')
+        print(f'{cor_verde('Série')}: {aluno['serie']}')
+        print(f'{cor_verde('Status')}: {'Formado' if aluno['formado'] else 'Em curso'}')
 
 def menu_ordenacao():
+    '''Exibe o menu de ordenação e retorna os critérios'''
     while True:
-        print("—" * 60 +
-              f'\n1. {cor_verde("Nome")}\n'
-              f'2. {cor_verde("Idade")}\n'
-              f'3. {cor_verde("Nota")}\n'
-              f'4. {cor_verde("Série")}\n'
-              f'5. {cor_verde("Status de Formação")}\n'
-              + '—' * 60)
-        campo = input("Escolha um campo para ordenação: ").strip()
+        print('—' * 60)
+        print(f'1. {cor_verde('Nome')}')
+        print(f'2. {cor_verde('Idade')}')
+        print(f'3. {cor_verde('Nota')}')
+        print(f'4. {cor_verde('Série')}')
+        print(f'5. {cor_verde('Status de Formação')}')
+        print('—' * 60)
+
+        campo = input('Escolha um campo para ordenação: ').strip()
+
         if campo not in ['1', '2', '3', '4', '5']:
-            print("\nOpção inválida! Por favor, escolha um número entre 1 e 5.")
+            print('\nOpção inválida! Por favor, escolha um número entre 1 e 5.')
             continue
+
         if campo == '5':
             print('\n' + '—' * 60)
             print(f'1. {cor_verde('Formados')}')
             print(f'2. {cor_verde('Em curso')}')
             print('—' * 60)
-            ordem = input("Escolha o status: ").strip()
-            if ordem not in ['1', '2']:
-                print("\nOpção inválida! Por favor, escolha 1 ou 2.")
-                continue
+            ordem = input('Escolha o status: ').strip()
 
+            if ordem not in ['1', '2']:
+                print('\nOpção inválida! Por favor, escolha 1 ou 2.')
+                continue
             return campo, ordem
+
         else:
             print('\n' + '—' * 60)
             print(f'1. {cor_verde('Crescente')}')
-            print(f'2. {cor_verde(f'Decrescente')}')
+            print(f'2. {cor_verde('Decrescente')}')
             print('—' * 60)
-            ordem = input("Escolha a ordem: ").strip()
-            if ordem not in ['1', '2']:
-                print("\nOpção inválida! Por favor, escolha 1 ou 2.")
-                continue
+            ordem = input('Escolha a ordem: ').strip()
 
+            if ordem not in ['1', '2']:
+                print('\nOpção inválida! Por favor, escolha 1 ou 2.')
+                continue
             return campo, ordem
 
+# ——— EDIÇÃO ———
+
 def editar_aluno(cadastro_alunos):
+    '''Permite editar os dados de um aluno existente'''
     if not cadastro_alunos:
-        print("\nNenhum aluno cadastrado!")
+        print('—' * 60 + '\nNenhum aluno cadastrado!')
         return
 
-    nome = input("Digite o nome do aluno para editar: ").title()
-    aluno_encontrado = None
+    nome = input('Nome do aluno a editar: ').title()
+    aluno = next((a for a in cadastro_alunos if a['nome'] == nome), None)
 
-    for aluno in cadastro_alunos:
-        if aluno['nome'] == nome:
-            aluno_encontrado = aluno
-            break
-
-    if not aluno_encontrado:
-        print("\nAluno não encontrado!")
+    if not aluno:
+        print('—' * 60 + '\nAluno não encontrado!')
         return
 
     while True:
-        print("\n" + "—" * 60)
-        print(f"Editando aluno: {aluno_encontrado['nome']}")
-        print("1. Nome")
-        print("2. Idade")
-        print("3. Nota")
-        print("4. Série")
-        print("5. Status de conclusão (apenas para 9º ano)")
-        print("6. Voltar")
-        print("—" * 60)
+        print('\nEditando:', aluno['nome'])
+        print(f'1. {cor_verde('Nome')}\n2. {cor_verde('Idade')}\n3. {cor_verde('Nota')}\n4. {cor_verde('Série')}\n5. {cor_verde('Status de Formação')}\n6. {cor_verde('Voltar')}')
+        escolha = input('Escolha a opção: ')
 
-        opcao = input("Escolha o campo para editar: ").strip()
-
-        if opcao == '1':
-            while True:
-                novo_nome = input("Digite o novo nome: ").strip()
-                if not novo_nome or not novo_nome.replace(' ', '').isalpha():
-                    print('Nome inválido!\n')
-                    continue
-                nome_completo = novo_nome.split(' ')
-                if len(nome_completo) < 2 or len(novo_nome) < 3:
-                    print('Nome inválido!\n')
-                    continue
-                aluno_encontrado['nome'] = novo_nome.title()
-                break
-
-        elif opcao == '2':
-            while True:
-                try:
-                    nova_idade = int(input("Digite a nova idade: "))
-                    if 0 <= nova_idade <= 123:
-                        aluno_encontrado['idade'] = nova_idade
-                        break
-                    print("Idade inválida!\n")
-                except ValueError:
-                    print("Idade inválida!\n")
-
-        elif opcao == '3':
-            while True:
-                try:
-                    nova_nota = int(input("Digite a nova nota: "))
-                    if 0 <= nova_nota <= 10:
-                        aluno_encontrado['nota final'] = nova_nota
-                        break
-                    print("Nota inválida!\n")
-                except ValueError:
-                    print("Nota inválida!\n")
-
-        elif opcao == '4':
-            SERIES = {
-                1: '1º ano', 2: '2º ano', 3: '3º ano',
-                4: '4º ano', 5: '5º ano', 6: '6º ano',
-                7: '7º ano', 8: '8º ano', 9: '9º ano',
-            }
-            while True:
-                try:
-                    nova_serie = int(input("Digite a nova série (1-9): "))
-                    if 1 <= nova_serie <= 9:
-                        aluno_encontrado['serie'] = SERIES[nova_serie]
-                        if nova_serie != 9:
-                            aluno_encontrado['formado'] = False
-                        break
-                    print("Série inválida!\n")
-                except ValueError:
-                    print("Série inválida!\n")
-
-        elif opcao == '5':
-            if aluno_encontrado['serie'] == '9º ano':
-                while True:
-                    status = input("O aluno já concluiu o 9º ano? (S/N): ").upper()
-                    if status in ['S', 'N']:
-                        aluno_encontrado['formado'] = (status == 'S')
-                        break
-                    print("Resposta inválida! Digite S para Sim ou N para Não.")
+        if escolha == '1':
+            novo_nome = input('Novo nome: ').strip()
+            if novo_nome and len(novo_nome.split()) >= 2:
+                aluno['nome'] = novo_nome.title()
+        elif escolha == '2':
+            idade = verificar_int(0, idade=None)['idade']
+            aluno['idade'] = idade
+        elif escolha == '3':
+            nota = verificar_int(0, nota=None)['nota']
+            aluno['nota final'] = nota
+        elif escolha == '4':
+            nova_serie = int(input('Nova série (1-9): '))
+            aluno['serie'] = f'{nova_serie}º ano'
+            if nova_serie != 9:
+                aluno['formado'] = False
+        elif escolha == '5':
+            if aluno['serie'] == '9º ano':
+                status = input('Concluiu o 9º ano? (S/N): ').upper()
+                aluno['formado'] = (status == 'S')
             else:
-                print("Apenas alunos do 9º ano podem ter o status de conclusão alterado!")
-
-        elif opcao == '6':
-            print("\nEdição concluída!")
+                print('Somente para alunos do 9º ano.')
+        elif escolha == '6':
             break
-
         else:
-            print("\nOpção inválida!")
+            print('—' * 60 + '\nOpção inválida.')
 
-        print(f"\nDados atualizados: {aluno_encontrado}")
+# ——— DELETAR ———
 
 def deletar_aluno(cadastro_alunos):
+    '''Remove um aluno da lista de cadastro'''
     if not cadastro_alunos:
-        print("\nNenhum aluno cadastrado!")
+        print('—' * 60 + '\nNenhum aluno cadastrado!')
         return
 
-    nome = input("Digite o nome do aluno para excluir: ").title()
-    for aluno in cadastro_alunos[:]:
+    nome = input('Digite o nome do aluno para excluir: ').title()
+    for aluno in cadastro_alunos:
         if aluno['nome'] == nome:
             cadastro_alunos.remove(aluno)
-            print("\nAluno removido com sucesso!")
+            print('—' * 60 + f'\nAluno {cor_verde('removido')} com sucesso!')
             return
-    print("\nAluno não encontrado!")
 
-def mostrar_nome_da_variavel(**kwargs) -> str:
-    for nome in kwargs:
-        return nome
+    print('—' * 60 + '\nAluno não encontrado!')
 
-def Verificar_int(contador, **kwargs) -> dict:
-    while True:
-        try:
-            nome = mostrar_nome_da_variavel(**kwargs)
-            arg = int(input(f'Digite a {cor_verde(nome)} do {contador}º aluno: '))
-            return {nome: arg}
-        except ValueError:
-            print(f'{nome} inválida.\n')
+# ——— GERADOR ———
 
-def Limpar(*arg) -> str:
-    texto = str(arg[0])
-    return f'{texto.replace("[", "").replace("]", "").replace("\'", "")}'
+def gerar_aluno():
+    '''Gera automaticamente um aluno com dados aleatórios'''
+    # Lista com 50 nomes próprios populares no Brasil
+    nomes = [
+        "Lucas", "João", "Maria", "Ana", "Pedro", "Gabriel", "Julia", "Beatriz", "Carlos", "Marcos",
+        "Fernanda", "Mateus", "Camila", "Rafael", "Larissa", "Bruna", "Gustavo", "Clara", "Vinícius", "Isabela",
+        "Eduardo", "Tatiane", "Rodrigo", "Letícia", "André", "Paula", "Bruno", "Amanda", "Thiago", "Jéssica",
+        "Felipe", "Vanessa", "Ricardo", "Patrícia", "Leonardo", "Simone", "Daniel", "Aline", "Diego", "Elaine",
+        "César", "Kelly", "Igor", "Renata", "Luiz", "Débora", "Henrique", "Natália", "Alex", "Yasmin"
+    ]
 
-def cor_verde(texto: str) -> str:
-        return f'\033[32m{texto}\033[0m'
+    # Lista com 50 primeiros sobrenomes comuns
+    sobrenomes1 = [
+        "da Silva", "dos Santos", "de Oliveira", "de Souza", "Pereira", "Lima", "Carvalho", "Ferreira", "Rodrigues",
+        "Almeida",
+        "Costa", "Gomes", "Martins", "Araujo", "Barbosa", "Ribeiro", "Dias", "Teixeira", "Fernandes", "Moura",
+        "Cavalcante", "Castro", "Rocha", "Rezende", "Melo", "Correia", "Farias", "Monteiro", "Freitas", "Andrade",
+        "Nunes", "Machado", "Nascimento", "Pinto", "Batista", "Cardoso", "Campos", "Antunes", "Borges", "Tavares",
+        "Cunha", "Moreira", "Morais", "Vieira", "Jesus", "Rezende", "Neves", "Fonseca", "Barros", "Peixoto"
+    ]
 
-def nome_ja_cadastrado(nome: str, cadastros: list) -> bool:
-    return any(aluno['nome'] == nome.title() for aluno in cadastros)
+    # Lista com 50 segundos sobrenomes comuns (pode repetir, ou variar)
+    sobrenomes2 = [
+        "da Silva", "dos Santos", "Costa", "Pereira", "de Oliveira", "de Souza", "Rodrigues", "Almeida", "Lima",
+        "Ferreira",
+        "Ribeiro", "Martins", "Gomes", "Araújo", "Barbosa", "Moura", "Teixeira", "Fernandes", "Melo", "Rocha",
+        "Monteiro", "Castro", "Carvalho", "Cavalcante", "Dias", "Andrade", "Nascimento", "Machado", "Campos", "Batista",
+        "Correia", "Cardoso", "Freitas", "Tavares", "Cunha", "Morais", "Moreira", "Vieira", "Jesus", "Neves",
+        "Antunes", "Borges", "Fonseca", "Barros", "Peixoto", "Rezende", "Soares", "Aguiar", "Valente", "Assis"
+    ]
 
+    nome = f'{random.choice(nomes)} {random.choice(sobrenomes1)} {random.choice(sobrenomes2)}'
+    while nome.split(' ')[1] == nome.split(' ')[2]:
+        nome = f'{random.choice(nomes)} {random.choice(sobrenomes1)} {random.choice(sobrenomes2)}'
 
-def exibir_menu():
-    print('—' * 60)
-    print(f'1. {cor_verde('Adicionar')} aluno')
-    print(f'2. {cor_verde('Listar')} alunos')
-    print(f'3. {cor_verde('Editar')} aluno')
-    print(f'4. {cor_verde('Deletar')} aluno')
-    print(f'5. {cor_verde('Sair')}')
-    print('—' * 60)
-    return input('Escolha uma opção: ').strip()
+    serie = random.randint(1, 9)
+    idade = serie + 6 + random.choice([0]*8 + [1])
+    nota = random.randint(0, 10)
+    formado = random.choice([True, False]) if serie == 9 else False
 
-# cadastro_alunos = []
-cadastro_alunos = [{
-    'nome': 'João Silva',
-    'idade': 15,
-    'nota final': 8,
-    'serie': '7º ano',
-    'formado': False
-},
-{
-    'nome': 'Maria De Souza',  # Ajustado para o formato correto
-    'idade': 18,
-    'nota final': 9,
-    'serie': '9º ano',
-    'formado': True
-}]
+    aluno = {
+        'nome': nome,
+        'idade': idade,
+        'nota final': nota,
+        'serie': f'{serie}º ano',
+        'formado': formado
+    }
+
+    cadastro_alunos.append(aluno)
+    print('—' * 60 + f'\nAluno gerado: {aluno['nome']}')
+
+# ——— PROGRAMA PRINCIPAL ———
+
+cadastro_alunos = [
+    {'nome': 'João Silva', 'idade': 15, 'nota final': 8, 'serie': '7º ano', 'formado': False},
+    {'nome': 'Maria De Souza', 'idade': 18, 'nota final': 9, 'serie': '9º ano', 'formado': True}
+]
+
 print('—' * 60)
-print(f'{"SISTEMA DE GESTÃO DE ALUNOS":^60}')
+print(f'''{'SISTEMA DE GESTÃO DE ALUNOS':^60}''')
 
 while True:
     opcao = exibir_menu()
@@ -338,7 +338,9 @@ while True:
     elif opcao == '4':
         deletar_aluno(cadastro_alunos)
     elif opcao == '5':
-        print("\nEncerrando o programa...")
+        gerar_aluno()
+    elif opcao == '6':
+        print('Encerrando o programa...')
         break
     else:
-        print("\nOpção inválida!")
+        print('Opção inválida!')
