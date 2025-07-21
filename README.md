@@ -5,7 +5,7 @@ Projeto 2 da disciplina de Fundamentos de Programação.<br>
 Equipe: Jhefferson e Pablo.
 
 # Restrição técnica
-Ainda não informada.
+Nenhuma.
 
 # Enunciados
 ## Questao 1
@@ -22,7 +22,7 @@ decida parar.<br>
 os dados foram inseridos corretamente.<br>
 ### Funcionalidades extras
 1. Anos de escolaridade (1º ao 9º ano do ensino Fundamental)
-
+2. Gerador aleatório de alunos
 ## Questão 2
 ### Jogo de Pedra, Papel e Tesoura
 **Descrição:** Implementar o jogo clássico de Pedra, Papel e Tesoura, onde o usuário joga contra o computador.<br>
